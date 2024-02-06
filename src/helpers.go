@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"runtime/debug"
+
+	"snow.sahej.io/loggers"
 )
 
 func (app *Application) serverError(w http.ResponseWriter, err error) {
-	stackTrace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	app.errorLog.Println(stackTrace)
+	loggers.LogError(err)
 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
