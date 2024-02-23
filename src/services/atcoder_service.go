@@ -27,7 +27,7 @@ func (s *AtcoderService) FetchUpcomingContests() <-chan models.ContestDto {
 		scraper.OnHTML("#contest-table-upcoming tbody tr", func(e *colly.HTMLElement) {
 
 			name := e.ChildText("td:nth-of-type(2) a")
-			rawUrl := fmt.Sprintf("https://atcode.jp%s", e.ChildAttr("td:nth-of-type(2) a", "href"))
+			rawUrl := fmt.Sprintf("https://atcoder.jp%s", e.ChildAttr("td:nth-of-type(2) a", "href"))
 			rawStartTime := e.ChildText("td:nth-of-type(1) time")
 			rawDuration := e.ChildText("td:nth-of-type(3)")
 
@@ -81,7 +81,8 @@ func (s *AtcoderService) parseStartTime(startTime string) *time.Time {
 		return nil
 	}
 
-	return &t
+	utcTime := t.UTC()
+	return &utcTime
 }
 
 func (s *AtcoderService) getEndTime(startTime *time.Time, rawDuration string) *time.Time {

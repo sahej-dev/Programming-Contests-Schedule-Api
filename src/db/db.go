@@ -45,6 +45,10 @@ func (d *DatabaseInteractor) Exec(query string, args ...interface{}) error {
 	return err
 }
 
+func (d *DatabaseInteractor) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	return d.db.Query(query, args...)
+}
+
 func (d *DatabaseInteractor) Close() error {
 	return d.db.Close()
 }

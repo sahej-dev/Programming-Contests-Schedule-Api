@@ -7,6 +7,11 @@ import (
 	"snow.sahej.io/loggers"
 )
 
+func (app *Application) WriteJson(w http.ResponseWriter, content []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(content)
+}
+
 func (app *Application) serverError(w http.ResponseWriter, err error) {
 	loggers.LogError(err)
 

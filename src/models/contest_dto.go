@@ -1,11 +1,13 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"net/url"
 	"time"
 
 	"snow.sahej.io/db"
+	"snow.sahej.io/loggers"
 )
 
 type ContestDto struct {
@@ -132,4 +134,42 @@ func PopulateContestsApiTable(d *db.DatabaseInteractor) error {
 	err = tx.Commit()
 
 	return err
+}
+
+func GetAllApiContests(d *db.DatabaseInteractor) ([]ContestDto, error) {
+	contests := make([]ContestDto, 0)
+
+	rows, err := d.Query(`
+		SELECT name, url, start_time, end_time, judge
+		FROM contests_api
+		ORDER BY start_time
+	`)
+	if err != nil {
+		return contests, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var contest ContestDto
+		var urlString sql.NullString
+		err := rows.Scan(&contest.Name, &urlString, &contest.StartTime, &contest.EndTime, &contest.Judge)
+		if err != nil {
+			loggers.LogError(err)
+			continue
+		}
+		if urlString.Valid {
+			url, err := url.Parse(urlString.String)
+			if err != nil {
+				return contests, err
+			}
+			contest.Url = url
+		}
+		contests = append(contests, contest)
+	}
+
+	if err := rows.Err(); err != nil {
+		return contests, err
+	}
+
+	return contests, nil
 }

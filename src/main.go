@@ -10,7 +10,7 @@ import (
 	"snow.sahej.io/loggers"
 	"snow.sahej.io/models"
 	"snow.sahej.io/services"
-	"snow.sahej.io/utils"
+	// "snow.sahej.io/utils"
 )
 
 type Application struct {
@@ -64,8 +64,8 @@ func main() {
 	}
 
 	tryFetchSaveContests(time.Now())
-	ticker := utils.ExecuteEvery(time.Duration(30)*time.Second, tryFetchSaveContests)
-	defer ticker.Stop()
+	// ticker := utils.ExecuteEvery(time.Duration(30)*time.Second, tryFetchSaveContests)
+	// defer ticker.Stop()
 
 	err := srv.ListenAndServe()
 
