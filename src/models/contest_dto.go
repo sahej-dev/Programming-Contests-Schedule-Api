@@ -93,3 +93,43 @@ func EnsureContestsTableEmpty(d *db.DatabaseInteractor) error {
 
 	return err
 }
+
+func PopulateContestsApiTable(d *db.DatabaseInteractor) error {
+	tx, err := d.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(`
+        CREATE TABLE IF NOT EXISTS contests_api (
+            name TEXT,
+            url TEXT,
+            start_time TIMESTAMP,
+            end_time TIMESTAMP,
+            judge TEXT
+        )
+    `)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(`
+        DELETE FROM contests_api
+        WHERE TRUE
+    `)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO contests_api SELECT * FROM contests")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+
+	return err
+}

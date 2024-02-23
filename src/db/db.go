@@ -24,7 +24,7 @@ func GetInstance() *DatabaseInteractor {
 	defer lock.Unlock()
 
 	if instance == nil {
-		db, err := sql.Open("sqlite3", "sql_database.sqlite")
+		db, err := sql.Open("sqlite3", GetDbPath())
 		if err != nil {
 			loggers.LogError(err)
 			return nil
@@ -43,4 +43,12 @@ func (d *DatabaseInteractor) Exec(query string, args ...interface{}) error {
 	_, err := d.db.Exec(query, args...)
 
 	return err
+}
+
+func (d *DatabaseInteractor) Close() error {
+	return d.db.Close()
+}
+
+func (d *DatabaseInteractor) Begin() (*sql.Tx, error) {
+	return d.db.Begin()
 }

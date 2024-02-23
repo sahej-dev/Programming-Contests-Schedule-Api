@@ -2,14 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"snow.sahej.io/db"
 	"snow.sahej.io/loggers"
 	"snow.sahej.io/models"
 	"snow.sahej.io/services"
+	"snow.sahej.io/utils"
 )
 
 type Application struct {
@@ -28,9 +29,43 @@ func main() {
 		Handler:  app.routes(),
 	}
 
+	defer db.GetInstance().Close()
 	log.Printf("Starting server on %v", *PORT)
 
-	fetchAndSaveContests()
+	tryFetchSaveContests := func(tick time.Time) {
+		loggers.GetInstance().InfoLog.Printf("Tick: %s", tick)
+		backupId, err := db.Backup()
+
+		if _, ok := err.(db.DbDoesNotExist); err != nil && !ok {
+			loggers.LogError(err)
+			return
+		}
+
+		didDbExist := err != nil
+
+		err = fetchAndSaveContests()
+
+		if err != nil {
+			loggers.LogError(err)
+
+			if !didDbExist {
+				return
+			}
+
+			if err := db.Restore(backupId); err != nil {
+				loggers.LogError(err)
+				return
+			}
+
+			return
+		}
+
+		loggers.GetInstance().InfoLog.Printf("Contest Fetch and Save Success")
+	}
+
+	tryFetchSaveContests(time.Now())
+	ticker := utils.ExecuteEvery(time.Duration(30)*time.Second, tryFetchSaveContests)
+	defer ticker.Stop()
 
 	err := srv.ListenAndServe()
 
@@ -58,39 +93,43 @@ func fetchAndSaveContests() error {
 
 	err := models.EnsureContestsTableExists(d)
 	if err != nil {
-		// TODO: restore from previous db snapshot
+		return err
 	}
 	err = models.EnsureContestsTableEmpty(d)
 	if err != nil {
-		// TODO: restore from previous db snapshot
-		//
-		// Idea: just make a copy of the sqlite file before hand
-		// as a backup
+		return err
 	}
 
 	var contestsToSave []models.ContestDto
 
-	saveContests := func(cntsts []models.ContestDto) {
+	saveContests := func(cntsts []models.ContestDto) error {
 		err := models.SaveContests(cntsts, d)
-		if err != nil {
-			loggers.LogError(err)
-		}
+
+		return err
 	}
 
 	for contest := range contestGenerator {
-		fmt.Printf("%s - %s: %s\n", *contest.Judge.String(), contest.EndTime, contest.Url)
+		// fmt.Printf("%s - %s: %s\n", *contest.Judge.String(), contest.EndTime, contest.Url)
 		contestsToSave = append(contestsToSave, contest)
 
 		if len(contestsToSave) >= SAVE_BATCH_SIZE {
-			saveContests(contestsToSave)
+			err := saveContests(contestsToSave)
+			if err != nil {
+				return err
+			}
 
 			contestsToSave = nil
 		}
 	}
 
 	if contestsToSave != nil {
-		saveContests(contestsToSave)
+		err = saveContests(contestsToSave)
+		if err != nil {
+			return err
+		}
 	}
 
-	return nil
+	err = models.PopulateContestsApiTable(d)
+
+	return err
 }
