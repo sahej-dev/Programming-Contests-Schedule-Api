@@ -84,6 +84,7 @@ func fetchAndSaveContests() error {
 		&services.LeetcodeService{},
 		&services.AtcoderService{},
 		&services.CsacademyService{},
+		&services.HackerRankService{},
 	)
 
 	d := db.GetInstance()
