@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"snow.sahej.io/utils"
@@ -10,6 +11,7 @@ import (
 const dB_PATH = "./data"           // no trailing slash
 const dB_BACKUP_PATH = "./backups" // no trailing slash
 const dB_FILENAME = "database"     // no leading slash and file extension
+const dB_BACKUPS_TO_KEEP = 20
 
 func GetDbPath() string {
 	return fmt.Sprintf("%s/%s.sqlite", dB_PATH, dB_FILENAME)
@@ -51,6 +53,25 @@ func Restore(backupId string) error {
 
 	return err
 
+}
+
+func DeleteOldBackupsIfAny() error {
+	files, err := utils.ListDirFiles(dB_BACKUP_PATH)
+	if err != nil {
+		return err
+	}
+
+	sort.Strings(files)
+
+	if len(files) <= dB_BACKUPS_TO_KEEP {
+		return nil
+	}
+
+	filesToDelete := files[:len(files)-dB_BACKUPS_TO_KEEP]
+
+	err = utils.DeleteFiles(filesToDelete)
+
+	return err
 }
 
 func getBackupDbPath(backupId string) string {

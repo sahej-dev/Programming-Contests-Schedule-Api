@@ -4,6 +4,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -66,4 +67,31 @@ func CopyFile(sourcePath string, destinationPath string) error {
 	_, err = io.Copy(dFile, sFile)
 
 	return err
+}
+
+func ListDirFiles(dirPath string) ([]string, error) {
+	var files []string
+
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			files = append(files, filepath.Join(dirPath, entry.Name()))
+		}
+	}
+
+	return files, nil
+}
+
+func DeleteFiles(filePaths []string) error {
+	for _, file := range filePaths {
+		err := os.Remove(file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

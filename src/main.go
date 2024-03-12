@@ -33,6 +33,8 @@ func main() {
 
 	tryFetchSaveContests := func(tick time.Time) {
 		loggers.GetInstance().InfoLog.Printf("Tick: %s", tick)
+		db.DeleteOldBackupsIfAny()
+
 		backupId, err := db.Backup()
 
 		if _, ok := err.(db.DbDoesNotExist); err != nil && !ok {
