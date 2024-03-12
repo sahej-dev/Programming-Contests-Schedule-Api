@@ -62,7 +62,7 @@ func (s *LeetcodeService) FetchUpcomingContests() <-chan models.ContestDto {
 
 		for _, contest := range data.Data.Contests {
 			var parsedUrl *url.URL
-			if *&contest.Slug != nil {
+			if contest.Slug != nil {
 				contestUrl := fmt.Sprintf("https://leetcode.com/contest/%s/", *contest.Slug)
 				parsedUrl, err = url.ParseRequestURI(contestUrl)
 				if err != nil {

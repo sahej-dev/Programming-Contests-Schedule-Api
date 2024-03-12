@@ -7,7 +7,7 @@ import (
 	"snow.sahej.io/utils"
 )
 
-const dB_PATH = "."                // no trailing slash
+const dB_PATH = "./data"           // no trailing slash
 const dB_BACKUP_PATH = "./backups" // no trailing slash
 const dB_FILENAME = "database"     // no leading slash and file extension
 

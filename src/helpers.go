@@ -8,7 +8,7 @@ import (
 )
 
 func (app *Application) WriteJson(w http.ResponseWriter, content []byte) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(content)
 }
 

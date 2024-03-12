@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./logs:/app/logs
+      - ./src/backups:/app/backups
+      - ./src/data:/app/data
+    command: /bin/sh -c "/executable 1>>/app/logs/stdout.log 2>>/app/logs/stderr.log"

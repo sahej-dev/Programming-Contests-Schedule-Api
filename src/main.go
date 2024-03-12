@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 	"time"
 
@@ -30,7 +29,7 @@ func main() {
 	}
 
 	defer db.GetInstance().Close()
-	log.Printf("Starting server on %v", *PORT)
+	loggers.GetInstance().InfoLog.Printf("Starting server on %v", *PORT)
 
 	tryFetchSaveContests := func(tick time.Time) {
 		loggers.GetInstance().InfoLog.Printf("Tick: %s", tick)
@@ -41,7 +40,7 @@ func main() {
 			return
 		}
 
-		didDbExist := err != nil
+		didDbExist := err == nil
 
 		err = fetchAndSaveContests()
 

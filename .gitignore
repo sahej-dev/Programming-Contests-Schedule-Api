@@ -19,3 +19,15 @@ go.work
 
 # Database files
 *.sqlite
+
+# Log files
+logs/
+
+# Editor config
+.vscode
+
+# OS files
+.DS_Store
+
+# Debug intermediates
+__debug*

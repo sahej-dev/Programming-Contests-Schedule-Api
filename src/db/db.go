@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"snow.sahej.io/loggers"
+	"snow.sahej.io/utils"
 )
 
 type DatabaseInteractor struct {
@@ -24,6 +25,7 @@ func GetInstance() *DatabaseInteractor {
 	defer lock.Unlock()
 
 	if instance == nil {
+		utils.EnsureDirExists(dB_PATH)
 		db, err := sql.Open("sqlite3", GetDbPath())
 		if err != nil {
 			loggers.LogError(err)
