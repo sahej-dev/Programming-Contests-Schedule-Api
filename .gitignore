@@ -31,3 +31,6 @@ logs/
 
 # Debug intermediates
 __debug*
+
+# Shhhh
+*.secrets
