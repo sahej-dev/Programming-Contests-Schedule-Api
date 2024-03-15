@@ -13,7 +13,7 @@ func (app *Application) routes() http.Handler {
 
 	mux.HandleFunc("/", app.home)
 
-	return app.logRequest(mux)
+	return app.rateLimitIfRequired(app.logRequest(mux))
 }
 
 func (app *Application) home(w http.ResponseWriter, r *http.Request) {

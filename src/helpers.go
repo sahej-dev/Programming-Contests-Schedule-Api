@@ -32,3 +32,7 @@ func (app *Application) handleErrorByClosingConnection(w http.ResponseWriter) {
 		app.serverError(w, fmt.Errorf("%s", err))
 	}
 }
+
+func (app *Application) tooManyRequestsError(w http.ResponseWriter) {
+	http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+}
