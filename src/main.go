@@ -65,7 +65,7 @@ func main() {
 	}
 
 	tryFetchSaveContests(time.Now())
-	ticker := utils.ExecuteEvery(time.Duration(30)*time.Minute, tryFetchSaveContests)
+	ticker := utils.ExecuteEvery(time.Duration(24)*time.Hour, tryFetchSaveContests)
 	defer ticker.Stop()
 
 	err := srv.ListenAndServe()
